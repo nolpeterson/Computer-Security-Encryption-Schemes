@@ -9,40 +9,78 @@ def RC4(keySize, keyFile, inputFile, outputFile, operation):
     if (operation == "encrypt"):
         # Open the key file and store the key 
         f = open(keyFile, 'r+b')
-        # f = open(keyFile)
         key = f.read()
         f.close()
 
         # Open the input file as binary
         f = open(inputFile, 'r+b')
         plaintext = f.read()
-        f.close()
+        f.close()   
 
         # Get the keystream
-        getKeystream(key)
+        s = KSA(key)
+        keyStream = PRGA(s, plaintext)
+        # Throw away the first 3072 bits
+        keyStream[3072:]
 
-        cipher = ""
+        print("keystream: ")
+        print(keyStream)
+        print("plaintext: ")
+        print(plaintext)
 
         # Encrypt the plaintext
-        for c in plaintext:
-            cipher += plaintext ^ key.next()
+        cipher = []
+        for i in plaintext:
+            x = keyStream[i] ^ plaintext[i]
+            cipher.append(x)
+
+        print("ciphertext:")
+        print(cipher)
 
         # Open the output file
         f = open(outputFile, 'w+b')
-        # byte_arr = [120, 3, 255, 0, 100]
-        # binary_format = bytearray(byte_arr)
-        # f.write(binary_format)
-        # keystream.to_bytes()
-        f.write(key)
+        binary_format = bytearray(cipher)
+        f.write(binary_format)
+
+        # f.write(key)
         f.close()
 
-def getKeystream(key):
-    s = KSA(key)
-    keyStream = PRGA(s)
-    # Throw away the first 3072 bits
-    for i in range(3072):
-        next(keyStream)
-    return keyStream
+    if (operation == "decrypt"):
+        # Open the key file and store the key 
+        f = open(keyFile, 'r+b')
+        key = f.read()
+        f.close()
+
+        # Open the input file as binary
+        f = open(inputFile, 'r+b')
+        ciphertext = f.read()
+        f.close()
+
+        # Get the keystream
+        s = KSA(key)
+        keyStream = PRGA(s, ciphertext)
+        # Throw away the first 3072 bits
+        keyStream[3072:]
+
+        print("keystream: ")
+        print(keyStream)
+        print("plaintext: ")
+        print(ciphertext)
+
+        # Decrypt the ciphertext
+        plaintext = []
+        for i in ciphertext:
+            x = keyStream[i] ^ ciphertext[i]
+            plaintext.append(x)
+
+        print("plaintext:")
+        print(plaintext)
+
+        # Open the output file
+        f = open(outputFile, 'w+b')
+        binary_format = bytearray(plaint)
+        f.write(binary_format)
+        f.close()
 
 # Key-scheduling algorithm
 def KSA(key):
@@ -58,15 +96,19 @@ def KSA(key):
     return s
 
 # Pseudo-random generation algorithm
-def PRGA(s):
+def PRGA(s, plaintext):
     i = 0
     j = 0
+    keystreamList = []
 
-    while 1:
+    for p in plaintext:
         i = (i + 1) % 256
         j = (j + s[i]) % 256
         s[i], s[j] = s[j], s[i]
-        K = s[(s[i] + s[j]) % 256]
-        yield K
+        k = s[(s[i] + s[j]) % 256]
+        keystreamList.append(k)
+        # print(keystreamList)
+    
+    return keystreamList
 
 RC4(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
