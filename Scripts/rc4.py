@@ -30,7 +30,7 @@ def RC4(keySize, keyFile, inputFile, outputFile, operation):
 
         # Encrypt the plaintext
         cipher = []
-        for i in plaintext:
+        for i in range(len(plaintext)):
             x = keyStream[i] ^ plaintext[i]
             cipher.append(x)
 
@@ -69,7 +69,10 @@ def RC4(keySize, keyFile, inputFile, outputFile, operation):
 
         # Decrypt the ciphertext
         plaintext = []
-        for i in ciphertext:
+        print(len(ciphertext))
+        print(len(keyStream))
+
+        for i in range(len(ciphertext)):
             x = keyStream[i] ^ ciphertext[i]
             plaintext.append(x)
 
@@ -78,7 +81,7 @@ def RC4(keySize, keyFile, inputFile, outputFile, operation):
 
         # Open the output file
         f = open(outputFile, 'w+b')
-        binary_format = bytearray(plaint)
+        binary_format = bytearray(plaintext)
         f.write(binary_format)
         f.close()
 
