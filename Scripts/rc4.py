@@ -23,6 +23,7 @@ def RC4(keySize, keyFile, inputFile, outputFile, operation):
         # Throw away the first 3072 bits
         keyStream[3072:]
 
+        # Output the keystream and plaintext
         print("keystream: ")
         print(keyStream)
         print("plaintext: ")
@@ -34,6 +35,7 @@ def RC4(keySize, keyFile, inputFile, outputFile, operation):
             x = keyStream[i] ^ plaintext[i]
             cipher.append(x)
 
+        # Output the resulting ciphertext
         print("ciphertext:")
         print(cipher)
 
@@ -62,20 +64,19 @@ def RC4(keySize, keyFile, inputFile, outputFile, operation):
         # Throw away the first 3072 bits
         keyStream[3072:]
 
+        # Output the keystream and ciphertext
         print("keystream: ")
         print(keyStream)
-        print("plaintext: ")
+        print("ciphertext: ")
         print(ciphertext)
 
         # Decrypt the ciphertext
         plaintext = []
-        print(len(ciphertext))
-        print(len(keyStream))
-
         for i in range(len(ciphertext)):
             x = keyStream[i] ^ ciphertext[i]
             plaintext.append(x)
 
+        # Output the resulting plaintext
         print("plaintext:")
         print(plaintext)
 
@@ -114,4 +115,5 @@ def PRGA(s, plaintext):
     
     return keystreamList
 
+# Run the RC4 with 5 command-line arguments
 RC4(sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4], sys.argv[5])
