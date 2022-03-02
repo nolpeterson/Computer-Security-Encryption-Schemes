@@ -13,7 +13,8 @@ def verify(inputFile, hash):
 
     f = open(inputFile, 'rb')
     h0 = ""
-    for chunk in reverse(f, inputSize, lastChunkSize, 4096):
+    for chunk in reverse(f, inputSize, lastChunkSize):
+        # Create new hash for each chunk, and append
         h = SHA256.new()
         h.update(chunk)
         if(h0):
@@ -21,35 +22,28 @@ def verify(inputFile, hash):
         h0 = h.digest()
     f.close()
 
+    # Compare the given hash to the calculated hash
     if (hash == h0.hex()):
         print("True")
     else:
         print("False")
 
-	# Return the last hash (h0)
-    # return last_hash
-    # calculatedHash = calculate_hash(inputFile, blockSize)
-    # print(calculatedHash.hex())
-    # if (hash == calculatedHash.hex()):
-    #     print("True")
-    # else:
-    #     print("False")
 
-def reverse(file_object, file_size, last_chuck_size, chunk_size):
-	iter = 0
-	lastPos = file_size
-	while lastPos > 0:
-		size = chunk_size
-		if(iter == 0):
-			size = last_chuck_size
-
-		file_object.seek(lastPos - size)
-		data = file_object.read(chunk_size)
-		if not data:
+def reverse(f, fileSize, lastChunkSize):
+	x = 0
+	y = fileSize
+	while y > 0:
+		size = 4096
+		if(x == 0):
+			size = lastChunkSize
+        # Offset file search
+		f.seek(y - size)
+		chunk = f.read(4096)
+		if not chunk:
 			break
-
-		iter = iter + 1
-		lastPos -= size
-		yield data
+		x = x + 1
+		y -= size
+        # Return the chunk
+		yield chunk
 
 verify(sys.argv[1], sys.argv[2])
